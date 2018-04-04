@@ -1,73 +1,110 @@
-/**、
- * 一些常见的markdown规则的正则表达式
+const rules = {
+  headline:/(\#{1,6})([^\#\n]+)$/m,//m表示多行
+  code:/\s```\n?([^`]+)```/g,
+  breaker:/(^--+)|(\n--+)/g,
+  list:/([-+*]{1})(.[^\*]*)?/g,
+  link:/\[(.*)\]\((.*)\)/g,
+  pics:/!\[(.*)\]\((.*)\)/g,
+  mail:/<(([a-z0-9_\-\.])+\@([a-z0-9_\-\.])+\.([a-z]{2,7}))>/gmi,
+  quote:/^>(.*[^\n])|\n(.*[^\n])/,
+}
+
+/**
+ * 对html中特殊字符的转义
+ * @param html
+ * @returns {string}
  */
-const rules = [{
-  rule:/\*{2}(.[^\*]*)\*{2}/,
-  type:"embrance",
-  templete:"<b>$1</b>"
-},{
-  rule:/\*(.[^\*]*)\*/,
-  type:"ltalic",
-  templete:"<i>$1</i>"
-},{
-  rule:/--+/,
-  type:"cutoff",
-  templete:"<div class='cutoff'></div>"
-},{
-  rule:/([-+*]{1})(.[^\*]*)?/g,
-  type:"ul",
-  templete:"<ul><li>$2</li></ul>"
-},{
-  rule:/(`{3})(.*)(`{3})/g,
-  type:"code",
-  templete:"<code>$2</code>"
-},{
-  rule:/\[(.*)\]\((.*)\)/,
-  type:"link",
-  templete:"<a href='$1'>$2</a>"
-},{
-  rule:/!\[(.*)\]\((.*)\)/,
-  type:"pics",
-  templete:"<img src='$1' title='$2' href='$2'/>"
-}];
-const htmlRule = [{
-  rule:/\n/,
-  templete:"<br/>"
-}];
-//构造所有标题的正则表达式
-for(let i = 1;i < 7;i ++){
-  rules.push({
-    rule:new RegExp("(#{"+i+"})(.*)"),
-    type:"h"+i,
-    templete:"<h"+i+">$2</h"+i+">"
-  })
+function escape(html) {
+  if(html && html.length > 0){
+    return html.replace(/&(?!#?\w+;)/,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39');
+  }else
+    return '';
 }
 
-export default {
-  parse(input){
-    // console.table(rules)
-    let temp = input;
-    // temp = this.htmlParse(input);
-    return new Promise((resolve,reject)=>{
-      rules.forEach(e=>{
-        if(e.rule.test(input)){
-          console.log(`successful ${e.rule}`);
-          temp = temp.replace(e.rule,e.templete);
-          console.log(temp);
-        }
-      })
-      resolve(temp);
-    })
-  },
-  /**
-   * 对html特殊字符的转义
-   */
-  htmlParse(input){
-    htmlRule.forEach(e=>{
-      input.replace(e.rule,e.templete);
-    })
-    return input;
-  },
-
+/**
+ * 换行处理
+ */
+function creatBr(text){
+  let reg = /.*(\n).*?/,regRe;
+  while((regRe = reg.exec(text))!==null){
+    text = text.replace(regRe[1],`<br/>`);
+  }
+  return text;
 }
 
+
+class Parser{
+  constructor(content){
+    if(!content){
+      throw "请给构造器传入有效的数据";
+    }else{
+      this.content = content;
+    }
+  }
+  static parse(text){
+    /**
+     * head
+     */
+    let regResult;
+
+    while((regResult = rules.headline.exec(text))!==null){
+      console.log("I am in here----->>>>head")
+      let count = regResult[1].length;
+      let content = escape(regResult[2]);
+      text = text.replace(regResult[0],`<h${count}>${content}</h${count}>`);
+    }
+
+    /**
+     * code
+     */
+    while((regResult = rules.code.exec(text))!==null){
+      console.log("I am in here----->>>>code");
+      let content = regResult[1];
+      text = text.replace(regResult[0],`<pre><code>${content}</code></pre>`);
+    }
+
+    /**
+     * breaker
+     */
+    while((regResult = rules.breaker.exec(text)) !== null){
+      console.log("I am in here----->>>>break");
+      text = text.replace(regResult[0],`<div class="breaker"></div>`)
+    }
+
+    /**
+     * pics
+     * 因为图片的匹配规则和链接匹配规则接近但更加复杂，所以，先匹配图片
+     */
+    while((regResult = rules.pics.exec(text)) !== null){
+      console.log("I am in here----->>>>pic");
+      let href = regResult[1],
+        name = escape(regResult[2]);
+      text = text.replace(regResult[0],`<img href="${href}" title="${name}" alt="${name}"></img>`)
+    }
+
+    /**
+     * link
+     */
+    while((regResult = rules.link.exec(text)) !== null){
+      console.log("I am in here----->>>>link");
+      let href = regResult[1],
+        name = escape(regResult[2]);
+      text = text.replace(regResult[0],`<a href="${href}">${name}</a>`);
+    }
+
+    /**
+     * 处理换行
+     */
+    text = creatBr(text);
+    return text;
+  }
+  getContent(){
+    return this.content;
+  }
+}
+
+export {Parser};

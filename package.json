@@ -17,7 +17,8 @@
     "less": "^3.0.1",
     "less-loader": "^4.1.0",
     "style-loader": "^0.20.3",
-    "vue": "^2.5.2"
+    "vue": "^2.5.2",
+    "wkhtmltopdf": "^0.3.4"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

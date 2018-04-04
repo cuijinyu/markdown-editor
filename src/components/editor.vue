@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <div class="editor">
-      <textarea name="" id="input-textarea" cols="30" rows="30" v-model="input" @keyup="nextLine($event)" wrap="hard">
+      <textarea name="" id="input-textarea" cols="30" rows="30" v-model="input"  wrap="hard">
       </textarea>
     </div>
     <div class="reader">
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import rule from '../assets/js/rule';
+import {Parser} from '../assets/js/rule';
 let $ = require('jquery');
 var flag;
 var editor = {
@@ -25,26 +25,23 @@ var editor = {
     };
   },
   methods:{
-    nextLine:function (ev) {
-      if(ev.keyCode == 13){
-        console.log("succ")
-// document.getElementById();
-      }
-    }
+
   },
   watch:{
     input:function () {
+      /**
+       * 节流器
+       */
+      let parser;
       let self = this;
         if(this.input == this.beforeInput){
           return;
         }else{
           clearInterval(flag)
           flag = setInterval(()=>{
-            rule.parse(self.input)
-              .then(result => {
-                self.beforeInput = self.input;
-                self.output = result;
-              })
+            self.beforeInput = self.input;
+            console.log(self.input);
+            self.output = Parser.parse(self.input);
           },2000);
         }
     }
@@ -53,7 +50,6 @@ var editor = {
 export default editor;
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less" scoped>
   .main{
     width:100%;
