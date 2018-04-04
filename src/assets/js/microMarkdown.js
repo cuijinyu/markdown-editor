@@ -31,7 +31,7 @@ function escape(html) {
 function creatBr(text){
   let reg = /.*(\n).*?/,regRe;
   while((regRe = reg.exec(text))!==null){
-    text = text.replace(regRe[1],`<br/>`);
+    text = text.replace(regRe[1],`<div></div>`);
   }
   return text;
 }
@@ -55,7 +55,7 @@ class Parser{
       console.log("I am in here----->>>>head")
       let count = regResult[1].length;
       let content = escape(regResult[2]);
-      text = text.replace(regResult[0],`<h${count}>${content}</h${count}>`);
+      text = text.replace(regResult[0],`<h${count}  class="markdown" data-v-2bc4b246>${content}</h${count}>`);
     }
 
     /**
@@ -72,7 +72,7 @@ class Parser{
      */
     while((regResult = rules.breaker.exec(text)) !== null){
       console.log("I am in here----->>>>break");
-      text = text.replace(regResult[0],`<div class="breaker"></div>`)
+      text = text.replace(regResult[0],`<div class="breaker" data-v-2bc4b246></div>`)
     }
 
     /**

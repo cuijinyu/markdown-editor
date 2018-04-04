@@ -12,10 +12,9 @@
 </template>
 
 <script>
-import {Parser} from '../assets/js/rule';
-let $ = require('jquery');
-var flag;
-var editor = {
+import {Parser} from '../assets/js/microMarkdown';
+let flag;
+let editor = {
   name: 'HelloWorld',
   data () {
     return {
@@ -51,6 +50,14 @@ export default editor;
 </script>
 
 <style lang="less" scoped>
+  //清除所有默认样式
+  *{
+    margin:0;
+    padding: 0;
+  }
+  br{
+    line-height: 5px;
+  }
   .main{
     width:100%;
     height:600px;
@@ -61,13 +68,17 @@ export default editor;
     }
     .reader{
       margin-left:50%;
-      height: 100%;
+      height: 110%;
       #output-textarea{
         padding:10px;
         font-size:20px;
         font-family: 微软雅黑;
         border:1px solid grey;
-        height: 100%;
+        height: 600px;
+        overflow: auto;
+        background-color: bisque;
+        border-radius: 2px;
+        box-shadow: 1px 1px 1px darkgrey;
       }
     }
     #input-textarea{
@@ -75,11 +86,48 @@ export default editor;
       margin:0 auto;
       outline: none;
       resize:none;
-      width: 90%;
+      width: 95%;
       height: 100%;
       padding:10px;
       font-size:20px;
+      overflow: auto;
       font-family: 微软雅黑;
+      background-color: black;
+      color:white;
+      border-radius: 2px;
+      box-shadow: 1px 1px 1px darkgrey;
     }
+    #input-textarea::-webkit-scrollbar{
+      border-radius:5px;
+      background-color: darkgrey;
+    }
+    #input-textarea::-webkit-scrollbar-thumb{
+      border-radius:5px;
+      background-color: ghostwhite;
+    }
+    #output-textarea::-webkit-scrollbar{
+       border-radius: 5px;
+       background-color: darkgrey;
+     }
+    #output-textarea::-webkit-scrollbar-thumb{
+      border-radius: 5px;
+      background-color: black;
+    }
+  }
+  /*定义markdown文档的样式*/
+  h1{
+    border-bottom:3px solid darkgrey;
+  }
+  h2{
+    border-bottom: 2px solid darkgrey;
+  }
+  h3{
+    border-bottom: 1px solid darkgrey;
+  }
+  .breaker{
+    height: 1px;
+    margin-top:5px;
+    margin-bottom: 5px;
+    background-color: darkgrey;
   }
 </style>
