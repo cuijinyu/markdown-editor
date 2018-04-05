@@ -130,4 +130,11 @@ export default editor;
     margin-bottom: 5px;
     background-color: darkgrey;
   }
+  quote{
+    padding-bottom: 10px;
+    padding-top:10px;
+    width:100%;
+    /*background-color: beige;*/
+    border-radius: 5px;
+  }
 </style>

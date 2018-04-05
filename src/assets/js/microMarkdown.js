@@ -7,6 +7,7 @@ const rules = {
   pics:/!\[(.*)\]\((.*)\)/g,
   mail:/<(([a-z0-9_\-\.])+\@([a-z0-9_\-\.])+\.([a-z]{2,7}))>/gmi,
   quote:/^>(.*[^\n])|\n(.*[^\n])/,
+  text:/^[^\n]+/
 }
 
 /**
@@ -27,6 +28,7 @@ function escape(html) {
 
 /**
  * 换行处理
+ * <br>标签会出现行距问题，相比较来说div既是块级元素，同时没有默认的高度，最适合处理换行问题
  */
 function creatBr(text){
   let reg = /.*(\n).*?/,regRe;
@@ -43,6 +45,7 @@ class Parser{
       throw "请给构造器传入有效的数据";
     }else{
       this.content = content;
+      this.result = Parser.parse(this.content);
     }
   }
   static parse(text){
@@ -97,13 +100,21 @@ class Parser{
     }
 
     /**
+     * quote
+     */
+    while((regResult = rules.quote.exec(text)) !== null){
+        let content = regResult[1];
+        text = text.replace(regResult[0],`<div style="width:100%;padding-top: 10px;padding-bottom:10px;padding-left:5px;background-color:grey;border-left:5px solid lightgreen;border-radius:5px;"><quote data-v-2bc4b246>${content}</quote></div>`)
+    }
+
+    /**
      * 处理换行
      */
     text = creatBr(text);
     return text;
   }
-  getContent(){
-    return this.content;
+  getResult(){
+    return this.result;
   }
 }
 
