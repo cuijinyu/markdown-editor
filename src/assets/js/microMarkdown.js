@@ -1,3 +1,7 @@
+/**
+ *
+ * @type {{headline: RegExp, code: RegExp, breaker: RegExp, list: RegExp, link: RegExp, pics: RegExp, mail: RegExp, quote: RegExp, text: RegExp, def: RegExp, lists: RegExp}}
+ */
 const rules = {
   headline:/(\#{1,6})([^\#\n]+)$/m,//m表示多行
   code:/\s```\n?([^`]+)```/g,
@@ -6,9 +10,11 @@ const rules = {
   link:/\[(.*)\]\((.*)\)/g,
   pics:/!\[(.*)\]\((.*)\)/g,
   mail:/<(([a-z0-9_\-\.])+\@([a-z0-9_\-\.])+\.([a-z]{2,7}))>/gmi,
-  quote:/^>(.*[^\n])|\n(.*[^\n])/,
-  text:/^[^\n]+/
-}
+  quote:/^( *>[^\n]+(\n(?!)[^\n]+)*\n*)+/,
+  text:/(^[^\n<](.+)([^>])$)/,
+  def:/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
+  lists: /^((\s*((\*|\-)|\d(\.|\))) [^\n]+)\n)+/gm,
+};
 
 /**
  * 对html中特殊字符的转义
@@ -104,9 +110,22 @@ class Parser{
      */
     while((regResult = rules.quote.exec(text)) !== null){
         let content = regResult[1];
-        text = text.replace(regResult[0],`<div style="width:100%;padding-top: 10px;padding-bottom:10px;padding-left:5px;background-color:grey;border-left:5px solid lightgreen;border-radius:5px;"><quote data-v-2bc4b246>${content}</quote></div>`)
+        content = content.replace(">","");
+        text = text.replace(regResult[0],`<div style="width:95%;padding-top: 10px;padding-bottom:10px;padding-left:5px;background-color:grey;border-left:5px solid lightgreen;border-radius:5px;margin:5px;margin-right:5px;word-wrap: break-word;"><quote data-v-2bc4b246>${content}</quote></div>`)
     }
 
+    // while((regResult = rules.text.exec(text)) !== null){
+    //   console.log("I am in here----->text");
+    //   let content = regResult[1];
+    //   text = text.replace(regResult[0], `<p>${content}</p>`);
+    // }
+
+    /**
+     * 对列表的处理，此处涉及对嵌套的处理
+     */
+    while((regResult = rules.lists.exec(text)) !== null){
+
+    }
     /**
      * 处理换行
      */

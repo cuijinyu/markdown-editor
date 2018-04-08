@@ -49,8 +49,7 @@ let editor = {
 export default editor;
 </script>
 
-<style lang="less" scoped>
-  //清除所有默认样式
+<style scoped>
   *{
     margin:0;
     padding: 0;
@@ -61,58 +60,58 @@ export default editor;
   .main{
     width:100%;
     height:600px;
-    .editor{
-      width: 50%;
-      height: 100%;
-      float:left;
-    }
-    .reader{
-      margin-left:50%;
-      height: 110%;
-      #output-textarea{
-        padding:10px;
-        font-size:20px;
-        font-family: 微软雅黑;
-        border:1px solid grey;
-        height: 600px;
-        overflow: auto;
-        background-color: bisque;
-        border-radius: 2px;
-        box-shadow: 1px 1px 1px darkgrey;
-      }
-    }
-    #input-textarea{
-      position:relative;
-      margin:0 auto;
-      outline: none;
-      resize:none;
-      width: 95%;
-      height: 100%;
-      padding:10px;
-      font-size:20px;
-      overflow: auto;
-      font-family: 微软雅黑;
-      background-color: black;
-      color:white;
-      border-radius: 2px;
-      box-shadow: 1px 1px 1px darkgrey;
-    }
-    #input-textarea::-webkit-scrollbar{
-      border-radius:5px;
-      background-color: darkgrey;
-    }
-    #input-textarea::-webkit-scrollbar-thumb{
-      border-radius:5px;
-      background-color: ghostwhite;
-    }
-    #output-textarea::-webkit-scrollbar{
-       border-radius: 5px;
-       background-color: darkgrey;
-     }
-    #output-textarea::-webkit-scrollbar-thumb{
-      border-radius: 5px;
-      background-color: black;
-    }
+  }
+  .editor{
+    width: 50%;
+    height: 100%;
+    float:left;
+  }
+  .reader{
+    margin-left:50%;
+    height: 110%;
+  }
+  #output-textarea{
+    padding:10px;
+    font-size:20px;
+    font-family: 微软雅黑;
+    border:1px solid grey;
+    height: 600px;
+    overflow: auto;
+    background-color: bisque;
+    border-radius: 2px;
+    box-shadow: 1px 1px 1px darkgrey;
+  }
+  #input-textarea{
+    position:relative;
+    margin:0 auto;
+    outline: none;
+    resize:none;
+    width: 95%;
+    height: 100%;
+    padding:10px;
+    font-size:20px;
+    overflow: auto;
+    font-family: 微软雅黑;
+    background-color: black;
+    color:white;
+    border-radius: 2px;
+    box-shadow: 1px 1px 1px darkgrey;
+  }
+  #input-textarea::-webkit-scrollbar{
+    border-radius:5px;
+    background-color: darkgrey;
+  }
+  #input-textarea::-webkit-scrollbar-thumb{
+    border-radius:5px;
+    background-color: ghostwhite;
+  }
+  #output-textarea::-webkit-scrollbar{
+    border-radius: 5px;
+    background-color: darkgrey;
+  }
+  #output-textarea::-webkit-scrollbar-thumb{
+    border-radius: 5px;
+    background-color: black;
   }
   /*定义markdown文档的样式*/
   h1{
@@ -136,5 +135,8 @@ export default editor;
     width:100%;
     /*background-color: beige;*/
     border-radius: 5px;
+  }
+  table{
+    border:1px solid black;
   }
 </style>
