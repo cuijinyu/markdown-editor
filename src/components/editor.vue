@@ -12,6 +12,8 @@
 </template>
 
 <script>
+let $ = require("jquery");
+// let hijs = require("highlight");
 import {Parser} from '../assets/js/microMarkdown';
 let flag;
 let editor = {
@@ -36,11 +38,17 @@ let editor = {
         if(this.input == this.beforeInput){
           return;
         }else{
-          clearInterval(flag)
+          clearInterval(flag);
           flag = setInterval(()=>{
             self.beforeInput = self.input;
             console.log(self.input);
             self.output = Parser.parse(self.input);
+            /**
+             * 利用highlight高亮代码
+             */
+            $("pre code").each(function(i, block) {
+              hljs.highlightBlock(block);
+            });
           },2000);
         }
     }
@@ -78,7 +86,7 @@ export default editor;
     height: 600px;
     overflow: auto;
     background-color: bisque;
-    border-radius: 2px;
+    border-radius: 5px;
     box-shadow: 1px 1px 1px darkgrey;
   }
   #input-textarea{
@@ -94,7 +102,7 @@ export default editor;
     font-family: 微软雅黑;
     background-color: black;
     color:white;
-    border-radius: 2px;
+    border-radius: 5px;
     box-shadow: 1px 1px 1px darkgrey;
   }
   #input-textarea::-webkit-scrollbar{
