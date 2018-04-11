@@ -14,7 +14,8 @@ const rules = {
   text:/(^[^\n<](.+)([^>])$)/,
   def:/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
   lists: /^(((\s*)((\*|\-)|\d(\.|\))) [^\n]+)\n)+/gm,
-  bolditalic:/(?:([\*_~]{1,3}))([^\*_~\n]+[^\*_~\s])\1/g
+  bolditalic:/(?:([\*_~]{1,3}))([^\*_~\n]+[^\*_~\s])\1/g,
+  latex:/\$\$(.*)\$\$/
 };
 
 /**
@@ -43,20 +44,6 @@ function creatBr(text){
     text = text.replace(regRe[1],`<div></div>`);
   }
   return text;
-}
-
-
-function creatList(indentContent){
-  let section = "";
-  if(indentContent.length == 0){
-    return '';
-  }
-  for(let i = 0;i < indentContent.length;i++){
-    section += `<li>${indentContent.shift()}</li>`;
-  }
-    section = `<ul>${section}</ul>`;
-    console.log(section);
-    return section;
 }
 
 class Parser{
@@ -133,7 +120,7 @@ class Parser{
     while((regResult = rules.pics.exec(text)) !== null){
       let href = regResult[1],
         name = escape(regResult[2]);
-      text = text.replace(regResult[0],`<img href="${href}" title="${name}" alt="${name}"></img>`)
+      text = text.replace(regResult[0],`<img href="${href}" title="${name}" alt="${name}" src="${href}"></img>`)
     }
 
     /**
@@ -158,34 +145,92 @@ class Parser{
      * 对列表的处理，此处涉及对嵌套的处理
      */
     while((regResult = rules.lists.exec(text)) !== null){
+        indentContent = [];
         let type = regResult[4];
         let content = regResult[2]; // 存储字符内容
 
-        if(typeof type.slice(0,1) == "string"){
+        let lis = regResult[0];
+        lis = lis.split("\n");
+
+        let section = "";
+        for(let i = 0;i < lis.length;i++){
           /**
-           * 当类型为无序列表时
+           * 对列表中的每一项进行正则检验
+           * @type {RegExp}
            */
-            if(regResult[3].length > maxIndent){
-              maxIndent = regResult[3].length;
-              indentCount ++;
-              indentContent.push(content.replace(regResult[4],""));
-              text = text.replace(regResult[0],creatList(indentContent));
+          let creatRules = /(\s*)([\*-]+|[0-9].*)(.*)/;
+          let result = creatRules.exec(lis[i]);
+
+          //如果符合正则规则
+          if(result !== null){
+            /**
+             * 那么将该部分加入数组中
+             */
+            indentContent.push({
+              content:result[3],
+              space:result[1].length,
+              used:false
+            })
+          }
+          let temp;//临时变量外置
+          for(let i = 0;i < indentContent.length;i ++){
+            temp = indentContent[i];
+            //如果之前有使用过，那么只需要加结尾
+            if(temp.used == true){
+              section += `<li>${temp.content}</li></ul>`;
+              continue;
             }else{
-              maxIndent = -1;
-              indentCount = 0;
-              text = text.replace(regResult[0],creatList(indentContent));
+
+              if(indentContent.length == 1){
+                console.log(indentContent.length)
+                section += `<ul><li>${temp.content}</li></ul>`;
+                break;
+              }
+
+              for(let j = i+1;j < indentContent.length;j ++){
+                if(indentContent[j].space >= temp.space){
+                  //如果是相同长度的缩进
+                  if(temp.space == indentContent[j].space && indentContent[j].used == false){
+                    indentContent[j].used = true;
+                    section+=`<ul><li>${temp.content}</li>`;
+                    continue;
+                  }else{
+                    let flag = false;
+                    for(let k = i;k < indentContent.length;k ++){
+                      if(temp.length > indentContent[j].length){
+                        flag = true;
+                      }
+                    }
+                    if(flag){
+                      section += `<ul>${temp.content}`;
+                      continue;
+                    }else{
+                      section += `<ul><li>${temp.content}</li></ul>`;
+                    }
+                  }
+                }else{
+
+                }
+              }
+
+
             }
-
-        }else if(typeof type.slice(0,1) == "number"){
-          /**
-           * 当类型是有序列表时
-           */
-
+          }
+          text = text.replace(regResult[0],section);
         }
 
     }
 
-    creatList(indentContent);
+    /**
+     * LaTex
+     */
+    while((regResult = rules.latex.exec(text)) !== null){
+      /**
+       * 处理latex公式时使用第三方网站，不使用本地工具了
+       */
+      let content = regResult[1];
+      text = text.replace(regResult[0],`<img src="http://latex.codecogs.com/gif.latex?${content}">`);
+    }
 
     /**
      * 处理换行
