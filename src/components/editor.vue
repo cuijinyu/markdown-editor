@@ -57,7 +57,7 @@ let editor = {
 export default editor;
 </script>
 
-<style scoped>
+<style scoped lang="less">
   *{
     margin:0;
     padding: 0;
@@ -146,5 +146,11 @@ export default editor;
   }
   table{
     border:1px solid black;
+  }
+  .math{
+    margin-left:auto;
+    margin-right: auto;
+    display: inline-block;
+    text-align: center;
   }
 </style>
