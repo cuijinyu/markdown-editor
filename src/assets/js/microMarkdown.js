@@ -150,6 +150,8 @@ class Parser {
       let content = regResult[2]; // 存储字符内容
       let lineCount = 0;//记录行数，每个ul为一行
       let stack = [];//用来存储每一行信息的堆栈
+      let ulCount = 0,
+          sharpCount = 0;//ulCount 用来记录新行数，sharpCount用来记录闭合数
 
       let lis = regResult[0];
       lis = lis.split("\n");
@@ -190,6 +192,7 @@ class Parser {
             type: 'li',
             content: indentContent[0].content
           });
+          ulCount ++;
           continue;
         }
         if (indentContent[i - 1].space !== indentContent[i].space) {
@@ -214,6 +217,7 @@ class Parser {
             type: 'li',
             content: indentContent[i].content
           });
+          sharpCount ++;
         } else if (indentContent[i].space == indentContent[i - 1].space) {
           stack.push({
             type: 'li',
@@ -221,6 +225,16 @@ class Parser {
           })
         }
       }//
+      ulCount = ulCount - 1;
+      while (sharpCount < ulCount){
+        debugger;
+        stack.push({
+          type:'#',
+          content:''
+        })
+        sharpCount++
+      }
+
       console.log(stack);
       while (stack.length !== 0) {
 
@@ -280,7 +294,6 @@ class Parser {
  * @param content 添加内容
  */
 Parser.addLi = function(text,content){
-  console.log("I am in addli");
   text = `<li>${content}</li>${text}`;
   return text;
 };
@@ -292,7 +305,6 @@ Parser.addLi = function(text,content){
  * @param type 文本类型
  */
 Parser.addList = function(text,type){
-  console.log("I am in addlist");
   if(type == 'ol'){
     text = `<ol>${text}</ol>`;
   }else{
@@ -306,17 +318,21 @@ Parser.addList = function(text,type){
  * @param text
  */
 Parser.addLine = function (text,stack) {
-  console.log("I am in addLine");
   let temp = stack.pop();
   let tempSection = "";
+  debugger;
   while(stack.length != 0) {
     if (temp.type == 'li') {
       tempSection = `<li>${temp.content}</li>${tempSection}`;
     } else if (temp.type == 'ul') {
-      tempSection = `<li><ul>${tempSection}</ul></li>`;
-      return tempSection + text;
-    } else if (temp.type == '#') {
-      return tempSection + text;
+      // if(stack[stack.length].type == '+') {
+        // }else{
+        //   tempSection = `<ul>${tempSection}</ul>`;
+        return "<ul>" + tempSection + text;
+        // }
+      // }
+    } else  if (temp.type == '#') {
+      return '</ul>'+ tempSection + text;
     }
     temp = stack.pop();
   }
@@ -325,49 +341,3 @@ Parser.addLine = function (text,stack) {
 };
 
 export {Parser};
-
-
-// @deprecated
-// 错误的嵌套处理逻辑
-// let temp;
-// for(let i = 0;i < indentContent.length;i ++){
-//   temp = indentContent[i];
-//   //如果之前有使用过，那么只需要加结尾
-//   if(temp.used == true){
-//     section += `<li>${temp.content}</li></ul>`;
-//     continue;
-//   }else{
-//
-//     if(indentContent.length == 1){
-//       console.log(indentContent.length)
-//       section += `<ul><li>${temp.content}</li></ul>`;
-//       break;
-//     }
-//
-//     for(let j = i+1;j < indentContent.length;j ++){
-//       if(indentContent[j].space >= temp.space){
-//         //如果是相同长度的缩进
-//         if(temp.space == indentContent[j].space && indentContent[j].used == false){
-//           indentContent[j].used = true;
-//           section+=`<ul><li>${temp.content}</li>`;
-//           continue;
-//         }else{
-//           let flag = false;
-//           for(let k = i;k < indentContent.length;k ++){
-//             if(temp.length > indentContent[j].length){
-//               flag = true;
-//             }
-//           }
-//           if(flag){
-//             section += `<ul>${temp.content}`;
-//             continue;
-//           }else{
-//             section += `<ul><li>${temp.content}</li></ul>`;
-//           }
-//         }
-//       }else{
-//
-//       }
-//     }
-//
-//
