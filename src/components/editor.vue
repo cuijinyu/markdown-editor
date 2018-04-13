@@ -85,7 +85,7 @@ export default editor;
     border:1px solid grey;
     height: 600px;
     overflow: auto;
-    background-color: bisque;
+    background-color: rgb(249,249,245);
     border-radius: 5px;
     box-shadow: 1px 1px 1px darkgrey;
   }
@@ -123,13 +123,13 @@ export default editor;
   }
   /*定义markdown文档的样式*/
   h1{
-    border-bottom:3px solid darkgrey;
+    border-bottom:3px solid #f1f3f1;
   }
   h2{
-    border-bottom: 2px solid darkgrey;
+    border-bottom: 2px solid #f1f3f1;
   }
   h3{
-    border-bottom: 1px solid darkgrey;
+    border-bottom: 1px solid #f1f3f1;
   }
   .breaker{
     height: 1px;

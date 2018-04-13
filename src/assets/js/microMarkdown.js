@@ -10,7 +10,7 @@ const rules = {
   link:/\[(.*)\]\((.*)\)/g,
   pics:/!\[(.*)\]\((.*)\)/g,
   mail:/<(([a-z0-9_\-\.])+\@([a-z0-9_\-\.])+\.([a-z]{2,7}))>/gmi,
-  quote:/^( *>[^\n]+(\n(?!)[^\n]+)*\n*)+/,
+  quote:/^( *>[^\n]+(\n(?!)[^\n]+)*\n*)+/gm,
   text:/(^[^\n<](.+)([^>])$)/,
   def:/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
   lists: /^(((\s*)((\*|\-)|\d(\.|\))) [^\n]+)\n)+/gm,
@@ -138,7 +138,7 @@ class Parser {
     while ((regResult = rules.quote.exec(text)) !== null) {
       let content = regResult[1];
       content = content.replace(">", "");
-      text = text.replace(regResult[0], `<div style="width:95%;padding-top: 10px;padding-bottom:10px;padding-left:5px;background-color:grey;border-left:5px solid lightgreen;border-radius:5px;margin:5px;margin-right:5px;word-wrap: break-word;"><quote data-v-2bc4b246>${content}</quote></div>`)
+      text = text.replace(regResult[0], `<div style="width:95%;padding-top: 10px;padding-bottom:10px;padding-left:5px;background-color:rgb(241,243,241);border-left:5px solid lightgreen;border-radius:5px;margin:5px;margin-right:5px;word-wrap: break-word;"><quote data-v-2bc4b246>${content}</quote></div>`)
     }
 
     /**
@@ -208,6 +208,7 @@ class Parser {
             type: 'li',
             content: indentContent[i].content
           });
+          ulCount ++;
         } else if (indentContent[i].space < indentContent[i - 1].space) {
           stack.push({
             type: '#',
@@ -225,7 +226,7 @@ class Parser {
           })
         }
       }//
-      ulCount = ulCount - 1;
+      // ulCount = ulCount - 1;
       while (sharpCount < ulCount){
         debugger;
         stack.push({
@@ -237,22 +238,7 @@ class Parser {
 
       console.log(stack);
       while (stack.length !== 0) {
-
-        while (lineCount !== 0) {
-          console.log(lineCount);
-          section = this.addLine(section, stack);
-          lineCount--;
-        }
-        let temp = stack.pop();
-
-        if (temp.type == 'li') {
-          section = this.addLi(section, temp.content);
-        }
-
-        if (stack.length == 0) {
-          section = this.addList(section, 'ul');
-        }
-
+        section = this.addLine(section, stack);
       }
 
       console.log(section);
@@ -325,18 +311,17 @@ Parser.addLine = function (text,stack) {
     if (temp.type == 'li') {
       tempSection = `<li>${temp.content}</li>${tempSection}`;
     } else if (temp.type == 'ul') {
-      // if(stack[stack.length].type == '+') {
-        // }else{
-        //   tempSection = `<ul>${tempSection}</ul>`;
+
         return "<ul>" + tempSection + text;
-        // }
-      // }
+
     } else  if (temp.type == '#') {
-      return '</ul>'+ tempSection + text;
+
+      return  '</ul>' +tempSection +  text;
+
     }
     temp = stack.pop();
   }
-
+  return '<ul>' + tempSection + text;
 
 };
 
