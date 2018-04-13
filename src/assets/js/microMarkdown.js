@@ -11,7 +11,7 @@ const rules = {
   pics:/!\[(.*)\]\((.*)\)/g,
   mail:/<(([a-z0-9_\-\.])+\@([a-z0-9_\-\.])+\.([a-z]{2,7}))>/gmi,
   quote:/^( *>[^\n]+(\n(?!)[^\n]+)*\n*)+/gm,
-  text:/(^[^\n<](.+)([^>])$)/,
+  text:/([^\n<](.+)([^>]))/,
   def:/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
   lists: /^(((\s*)((\*|\-)|\d(\.|\))) [^\n]+)\n)+/gm,
   bolditalic:/(?:([\*_~]{1,3}))([^\*_~\n]+[^\*_~\s])\1/g,
@@ -260,6 +260,16 @@ class Parser {
             <img src="http://latex.codecogs.com/gif.latex?${content}" class="math" data-v-2bc4b246>
         </div>
         `);
+    }
+
+    /**
+     * email
+     */
+    while((regResult = rules.mail.exec(text)) !== null){
+      console.log("I am mail link");
+      console.log(regResult);
+      let content = regResult[1];
+      text = text.replace(regResult[0],`<a href="mailto:${content}">${content}</a>`);
     }
 
     /**
