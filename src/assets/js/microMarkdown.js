@@ -1,6 +1,6 @@
 /**
- *
- * @type {{headline: RegExp, code: RegExp, breaker: RegExp, list: RegExp, link: RegExp, pics: RegExp, mail: RegExp, quote: RegExp, text: RegExp, def: RegExp, lists: RegExp}}
+ * 用来进行匹配的正则规则
+ * @type {{headline: RegExp, code: RegExp, breaker: RegExp, list: RegExp, link: RegExp, pics: RegExp, mail: RegExp, quote: RegExp, text: RegExp, def: RegExp, lists: RegExp, bolditalic: RegExp, latex: RegExp}}
  */
 const rules = {
   headline:/(\#{1,6})([^\#\n]+)$/m,//m表示多行
@@ -11,7 +11,7 @@ const rules = {
   pics:/!\[(.*)\]\((.*)\)/g,
   mail:/<(([a-z0-9_\-\.])+\@([a-z0-9_\-\.])+\.([a-z]{2,7}))>/gmi,
   quote:/^( *>[^\n]+(\n(?!)[^\n]+)*\n*)+/gm,
-  text:/([^\n<](.+)([^>]))/,
+  text:/(?:^\n)?(^[^<|>][\u4e00-\u9fa5a-z0-9_\-\.\@\*\s]+)\n?$/gm,
   def:/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
   lists: /^(((\s*)((\*|\-)|\d(\.|\))) [^\n]+)\n)+/gm,
   bolditalic:/(?:([\*_~]{1,3}))([^\*_~\n]+[^\*_~\s])\1/g,
@@ -132,14 +132,6 @@ class Parser {
       text = text.replace(regResult[0], `<a href="${href}">${name}</a>`);
     }
 
-    /**
-     * quote
-     */
-    while ((regResult = rules.quote.exec(text)) !== null) {
-      let content = regResult[1];
-      content = content.replace(">", "");
-      text = text.replace(regResult[0], `<div style="width:95%;padding-top: 10px;padding-bottom:10px;padding-left:5px;background-color:rgb(241,243,241);border-left:5px solid lightgreen;border-radius:5px;margin:5px;margin-right:5px;word-wrap: break-word;"><quote data-v-2bc4b246>${content}</quote></div>`)
-    }
 
     /**
      * 对列表的处理，此处涉及对嵌套的处理
@@ -151,18 +143,19 @@ class Parser {
       let lineCount = 0;//记录行数，每个ul为一行
       let stack = [];//用来存储每一行信息的堆栈
       let ulCount = 0,
-          sharpCount = 0;//ulCount 用来记录新行数，sharpCount用来记录闭合数
+        sharpCount = 0;//ulCount 用来记录新行数，sharpCount用来记录闭合数
 
       let lis = regResult[0];
       lis = lis.split("\n");
 
       let section = "";
       for (let i = 0; i < lis.length; i++) {
+
         /**
          * 对列表中的每一项进行正则检验
          * @type {RegExp}
          */
-        let creatRules = /(\s*)([\*-]+|[0-9].*)(.*)/;
+        let creatRules = /(\s*)([\*-]+|[0-9]+\.*)(.*)/;
         let result = creatRules.exec(lis[i]);
 
         //如果符合正则规则
@@ -170,12 +163,46 @@ class Parser {
           /**
            * 那么将该部分加入数组中
            */
+          let type;
+          if(result[2].slice(0) == '-' || result[2].slice(0) == '*'){
+            type = 'ul'
+          }else{
+            type = 'ol'
+          }
           indentContent.push({
             content: result[3],
             space: result[1].length,
-            type: result[2],
+            type: type,
             used: false
           })
+        }
+      }
+
+      /**
+       * 这个循环为每个嵌套确定其嵌套等级
+       */
+      let level = 0;//嵌套级别
+      for(let i = 0;i < indentContent.length;i ++){
+        for(let j = 0;j < i;j ++){
+
+         if(indentContent[i].space == indentContent[j].space) {
+            indentContent[i].level = indentContent[j].level;
+            continue;
+         }
+
+        }
+        if(i > 0){
+          if(indentContent[i].level == undefined){
+            if(indentContent[i].space > indentContent[i-1].space){
+              level ++;
+              indentContent[i].level = level;
+            }else{
+              level --;
+              indentContent[i].level = level;
+            }
+          }
+        }else{
+          indentContent[i].level = 0;
         }
       }
       /**
@@ -184,13 +211,23 @@ class Parser {
       for (let i = 0; i < indentContent.length; i++) {
         if (i == 0) {
           //当i为0时，添加底部
-          stack.push({
-            type: 'ul',
-            content: ''
-          });
+          if(indentContent[0].type == 'ul'){
+            stack.push({
+              type: 'ul',
+              content: '',
+              used:false
+            });
+          }else{
+            stack.push({
+              type: 'ol',
+              content:'',
+              used:false
+            })
+          }
           stack.push({
             type: 'li',
-            content: indentContent[0].content
+            content: indentContent[0].content,
+            level:indentContent[0].level
           });
           ulCount ++;
           continue;
@@ -200,35 +237,49 @@ class Parser {
         }
 
         if (indentContent[i].space > indentContent[i - 1].space) {
-          stack.push({
-            type: 'ul',
-            content: ''
-          });
+          if(indentContent[i].type == 'ul'){
+            stack.push({
+              type: 'ul',
+              content: '',
+              used:false
+            });
+          }else{
+            stack.push({
+              stack: 'ol',
+              content: '',
+              used:false
+            })
+          }
           stack.push({
             type: 'li',
-            content: indentContent[i].content
+            content: indentContent[i].content,
+            level:indentContent[i].level
           });
           ulCount ++;
         } else if (indentContent[i].space < indentContent[i - 1].space) {
-          stack.push({
-            type: '#',
-            content: ''
-          });
+          let short = indentContent[i-1].level - indentContent[i].level;
+          for(let k = 0;k < short;k ++){
+            stack.push({
+              type: '#',
+              content: ''
+            });
+            sharpCount ++;
+          }
           stack.push({
             type: 'li',
-            content: indentContent[i].content
+            content: indentContent[i].content,
+            level:indentContent[i].level
           });
-          sharpCount ++;
         } else if (indentContent[i].space == indentContent[i - 1].space) {
           stack.push({
             type: 'li',
-            content: indentContent[i].content
+            content: indentContent[i].content,
+            level:indentContent[i].level
           })
         }
       }//
       // ulCount = ulCount - 1;
       while (sharpCount < ulCount){
-        debugger;
         stack.push({
           type:'#',
           content:''
@@ -244,6 +295,18 @@ class Parser {
       console.log(section);
       text = text.replace(regResult[0], section);
     }
+
+
+    /**
+     * quote
+     */
+    while ((regResult = rules.quote.exec(text)) !== null) {
+      let content = regResult[1];
+      content = content.replace(">", "");
+      text = text.replace(regResult[0], `<div style="width:95%;padding-top: 10px;padding-bottom:10px;padding-left:5px;background-color:rgb(241,243,241);border-left:5px solid lightgreen;border-radius:5px;margin:5px;margin-right:5px;word-wrap: break-word;"><quote data-v-2bc4b246>${content}</quote></div>`)
+    }
+
+
 
 
     /**
@@ -270,6 +333,15 @@ class Parser {
       console.log(regResult);
       let content = regResult[1];
       text = text.replace(regResult[0],`<a href="mailto:${content}">${content}</a>`);
+    }
+
+    /**
+     * text
+     */
+    while((regResult = rules.text.exec(text)) !== null){
+      console.log(regResult);
+      let content = escape(regResult[1]);
+      text = text.replace(regResult[0],`<p>${content}</p>`);
     }
 
     /**
@@ -324,14 +396,32 @@ Parser.addLine = function (text,stack) {
 
         return "<ul>" + tempSection + text;
 
-    } else  if (temp.type == '#') {
+    } else if(temp.type == 'ol'){
 
-      return  '</ul>' +tempSection +  text;
+        return "<ol>" + tempSection + text;
+
+    }else  if (temp.type == '#') {
+        for(let i = 0;i < stack.length; i ++){
+          if(stack[i].used == false){
+            if(stack[i].type == 'ul'){
+              stack[i].used = true;
+              return '</ul>'+ tempSection + text;
+            }else if (stack[i].type == 'ol'){
+              stack[i].used = true;
+              return '</ol>' + tempSection + text;
+            }
+          }
+        }
+        // return  '</ul>' +tempSection +  text;
 
     }
     temp = stack.pop();
   }
-  return '<ul>' + tempSection + text;
+  if(temp.type == 'ul'){
+    return '<ul>' + tempSection + text;
+  }else{
+    return '<ol>' + tempSection + text;
+  }
 
 };
 

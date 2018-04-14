@@ -13,13 +13,14 @@
 
 <script>
 let $ = require("jquery");
-// let hijs = require("highlight");
+import TextOperation from '../assets/js/textOperation';
 import {Parser} from '../assets/js/microMarkdown';
 let flag;
 let editor = {
-  name: 'HelloWorld',
+  name: 'editor',
   data () {
     return {
+      op:"",//用来存储对输入区的操作
       input:"",
       output:"",
       beforeInput:""
@@ -30,11 +31,17 @@ let editor = {
   },
   watch:{
     input:function () {
+      let self = this;
+
+      //初始化对文本编辑器的操作
+      if(this.op == ''){
+        this.op = new TextOperation(document.getElementById("input-textarea"));
+      }
+
       /**
        * 节流器
        */
       let parser;
-      let self = this;
         if(this.input == this.beforeInput){
           return;
         }else{
@@ -54,11 +61,14 @@ let editor = {
     }
   }
 }
+
+
 export default editor;
 </script>
 
 <style scoped lang="less">
   *{
+    font-size:14px;
     margin:0;
     padding: 0;
   }
@@ -67,7 +77,7 @@ export default editor;
   }
   .main{
     width:100%;
-    height:600px;
+    height:100%;
   }
   .editor{
     width: 50%;
@@ -76,25 +86,27 @@ export default editor;
   }
   .reader{
     margin-left:50%;
-    height: 110%;
+    height: 100%;
   }
   #output-textarea{
     padding:10px;
     font-size:20px;
     font-family: 微软雅黑;
     border:1px solid grey;
-    height: 600px;
+    height: 100%;
+    width:45%;
     overflow: auto;
     background-color: rgb(249,249,245);
     border-radius: 5px;
+    position:fixed;
     box-shadow: 1px 1px 1px darkgrey;
   }
   #input-textarea{
-    position:relative;
+    position:fixed;
     margin:0 auto;
     outline: none;
     resize:none;
-    width: 95%;
+    width: 45%;
     height: 100%;
     padding:10px;
     font-size:20px;
@@ -152,5 +164,18 @@ export default editor;
     margin-right: auto;
     display: inline-block;
     text-align: center;
+  }
+  h1{
+    font-size: 24px;
+    font-weight: 400;
+    color: #313131;
+    padding-left: 20px;
+  }
+  h2{
+    font-size: 18px;
+    font-weight: 400;
+    padding-top: 30px;
+    padding-bottom: 10px;
+    color: #313131;
   }
 </style>
