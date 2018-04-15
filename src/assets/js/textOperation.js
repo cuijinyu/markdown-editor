@@ -83,29 +83,56 @@ class TextOperation {
   /**
    * 添加列表
    */
-  addLi(){
-
+  addList(){
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,"- ");
+    this.element.value = temp.join("");
   }
 
   /**
    * 添加引用
    */
   addQuote(){
-
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,"> ");
+    this.element.value = temp.join("");
   }
 
   /**
    * 添加代码段
    */
   addCode(){
-
+      let position = this.getPosition();
+      let temp = this.element.value;
+      temp = temp.split("");
+      temp.splice(position.start,0,`\n\`\`\`
+      
+      \`\`\`\n`);
+      this.element.value = temp.join("");
   }
 
   /**
    * 添加表格
    */
   addTable(){
-
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,`\n<table>
+<tr>
+  <th></th>
+  <th></th>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+</tr>
+</table>\n`);
+    this.element.value = temp.join("");
   }
 
   /**
@@ -119,7 +146,11 @@ class TextOperation {
    * 添加链接
    */
   addLink(){
-
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,"\n[]()");
+    this.element.value = temp.join("");
   }
 
   /**
@@ -133,24 +164,58 @@ class TextOperation {
    * 添加公式
    */
   addLatex(){
-
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,"\n$$ $$");
+    this.element.value = temp.join("");
   }
 
   /**
    * 添加图片
    */
   addPics(){
-
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,"\n![]()");
+    this.element.value = temp.join("");
   }
 
   /**
    * 添加分隔线
    */
   addBreaker(){
-
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,"\n------------\n");
+    this.element.value = temp.join("");
   }
 
+  addTitle(){
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,"\n# ");
+    this.element.value = temp.join("");
+  }
 
+  addBold(){
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,"** **");
+    this.element.value = temp.join("");
+  }
+
+  addItalic(){
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,"* *");
+    this.element.value = temp.join("");
+  }
 }
 
 export default TextOperation;
