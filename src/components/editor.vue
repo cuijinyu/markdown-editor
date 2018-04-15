@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <div class="editor">
-      <textarea name="" id="input-textarea" cols="30" rows="30" v-model="input"  wrap="hard">
+      <textarea name="" id="input-textarea" cols="30" rows="30" v-model="input"  wrap="hard" v-on:keyup.9="keydown">
       </textarea>
     </div>
     <div class="reader">
@@ -12,6 +12,12 @@
 </template>
 
 <script>
+//屏蔽默认tab
+document.onkeydown = function(){
+  if(event.keyCode == 9){
+    return false;
+  }
+}
 let $ = require("jquery");
 import TextOperation from '../assets/js/textOperation';
 import {Parser} from '../assets/js/microMarkdown';
@@ -27,17 +33,24 @@ let editor = {
     };
   },
   methods:{
-
+    /**
+     * 监听按键，增加编辑器输入tab的功能
+     */
+    keydown(){
+      let pos = this.op.getPosition().start;
+      this.op.addTab();
+      this.input = document.getElementById("input-textarea").value;
+      this.op.setPosition(pos+4,pos+4);
+      this.output = Parser.parse(this.input);
+    }
   },
   watch:{
     input:function () {
       let self = this;
-
       //初始化对文本编辑器的操作
       if(this.op == ''){
         this.op = new TextOperation(document.getElementById("input-textarea"));
       }
-
       /**
        * 节流器
        */

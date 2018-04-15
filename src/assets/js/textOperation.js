@@ -50,6 +50,7 @@ class TextOperation {
         range.moveStart('character',m);
         this.element.focus();
       }else if(window.getSelection){
+        console.log(this.element.selectionStart);
         this.startPos = this.element.selectionStart = m;
         this.endPos = this.element.selectionEnd = args2;
         this.element.focus();
@@ -65,7 +66,18 @@ class TextOperation {
    */
   getStr(m,n){
     this.getPosition(m,n);
-    return this.element.value.toString().slice(this.startPos, this.endPos);
+    return this.element.value.slice(this.startPos, this.endPos);
+  }
+
+  /**
+   * 缩进，增加四个空格
+   */
+  addTab(){
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,"    ");
+    this.element.value = temp.join("");
   }
 
   /**

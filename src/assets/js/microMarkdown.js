@@ -11,7 +11,8 @@ const rules = {
   pics:/!\[(.*)\]\((.*)\)/g,
   mail:/<(([a-z0-9_\-\.])+\@([a-z0-9_\-\.])+\.([a-z]{2,7}))>/gmi,
   quote:/^( *>[^\n]+(\n(?!)[^\n]+)*\n*)+/gm,
-  text:/(?:^\n)?(^[^<|>][\u4e00-\u9fa5a-z0-9_\-\.\@\*\s]+)\n?$/gm,
+  text:/(?:^\n)?(^[^<|>][\u4e00-\u9fa5a-z0-9_\-\.\@\*\s^\n]+)\n?/gm,
+  // text:/>([\u4e00-\u9fa5a-z0-9_\-\.\@\*\s]+)</gm,
   def:/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
   lists: /^(((\s*)((\*|\-)|\d(\.|\))) [^\n]+)\n)+/gm,
   bolditalic:/(?:([\*_~]{1,3}))([^\*_~\n]+[^\*_~\s])\1/g,
@@ -308,7 +309,6 @@ class Parser {
 
 
 
-
     /**
      * LaTex
      */
@@ -335,15 +335,19 @@ class Parser {
       text = text.replace(regResult[0],`<a href="mailto:${content}">${content}</a>`);
     }
 
-    /**
-     * text
-     */
+    // /**
+    //  * text
+    //  */
+    // while((regResult = rules.text.exec(text)) !== null){
+    //   console.log(regResult);
+    //   let content = escape(regResult[1]);
+    //   text = text.replace(regResult[0],`<p>${content}</p>`);
+    // }
+
+
     while((regResult = rules.text.exec(text)) !== null){
       console.log(regResult);
-      let content = escape(regResult[1]);
-      text = text.replace(regResult[0],`<p>${content}</p>`);
     }
-
     /**
      * 处理换行
      */
@@ -388,7 +392,6 @@ Parser.addList = function(text,type){
 Parser.addLine = function (text,stack) {
   let temp = stack.pop();
   let tempSection = "";
-  debugger;
   while(stack.length != 0) {
     if (temp.type == 'li') {
       tempSection = `<li>${temp.content}</li>${tempSection}`;
@@ -401,8 +404,11 @@ Parser.addLine = function (text,stack) {
         return "<ol>" + tempSection + text;
 
     }else  if (temp.type == '#') {
+
         for(let i = 0;i < stack.length; i ++){
+
           if(stack[i].used == false){
+
             if(stack[i].type == 'ul'){
               stack[i].used = true;
               return '</ul>'+ tempSection + text;
@@ -410,7 +416,9 @@ Parser.addLine = function (text,stack) {
               stack[i].used = true;
               return '</ol>' + tempSection + text;
             }
+
           }
+
         }
         // return  '</ul>' +tempSection +  text;
 
@@ -418,9 +426,13 @@ Parser.addLine = function (text,stack) {
     temp = stack.pop();
   }
   if(temp.type == 'ul'){
+
     return '<ul>' + tempSection + text;
+
   }else{
+
     return '<ol>' + tempSection + text;
+
   }
 
 };
