@@ -51,7 +51,6 @@ let editor = {
      */
     keydown(){
       let pos = this.op.getPosition().start;
-      debugger;
       this.op.addTab();
       this.input = document.getElementById("input-textarea").value;
       this.op.setPosition(pos+4,pos+4);
@@ -59,7 +58,6 @@ let editor = {
     },
     addTitle(){
       let pos = this.op.getPosition().start;
-      debugger;
       console.log(this.op);
       this.op.addTitle();
       this.input = document.getElementById("input-textarea").value;
