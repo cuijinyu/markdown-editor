@@ -238,44 +238,104 @@ class Parser {
         }
 
         if (indentContent[i].space > indentContent[i - 1].space) {
-          if(indentContent[i].type == 'ul'){
+          let flag = false;//设立一个标志，检测是否是再次出现如此缩进
+
+          for(let k = 0;k < i;k++){
+            //如果曾经出现过如此大或者更大的缩进
+            if(indentContent[k].level >= indentContent[i].level){
+                flag = true;
+            }
+
+          }
+
+          if(flag == false){
+
+            if(indentContent[i].type == 'ul'){
+              stack.push({
+                type: 'ul',
+                content: '',
+                used:false
+              });
+            }else{
+              stack.push({
+                stack: 'ol',
+                content: '',
+                used:false
+              })
+            }
             stack.push({
-              type: 'ul',
-              content: '',
-              used:false
+              type: 'li',
+              content: indentContent[i].content,
+              level:indentContent[i].level,
+              used:undefined
             });
+            ulCount ++;
+
           }else{
+            //由于要闭合当前级的标签
+            for(let k = 0;k < ulCount - sharpCount;k ++){
+              stack.push({
+                type:'#',
+                content:'',
+                used:undefined
+              });
+            }
+            ulCount = 0;
+            sharpCount = 0;
+            for(let k = 0;k < indentContent[i].level;k ++){
+              stack.push({
+                type:'ul',
+                content:'',
+                used:false,
+              })
+              ulCount ++;
+            }
+
+            if(indentContent[i].type == "ul"){
+              stack.push({
+                type:'ul',
+                content:'',
+                used:false
+              })
+              ulCount ++;
+            }else{
+              stack.push({
+                type:'ol',
+                content:'',
+                used:false
+              })
+              ulCount ++;
+            }
+
             stack.push({
-              stack: 'ol',
-              content: '',
-              used:false
+              type:'li',
+              content:indentContent[i].content,
+              used:undefined
             })
           }
-          stack.push({
-            type: 'li',
-            content: indentContent[i].content,
-            level:indentContent[i].level
-          });
-          ulCount ++;
+
         } else if (indentContent[i].space < indentContent[i - 1].space) {
           let short = indentContent[i-1].level - indentContent[i].level;
           for(let k = 0;k < short;k ++){
             stack.push({
               type: '#',
-              content: ''
+              content: '',
+              used:undefined
             });
             sharpCount ++;
           }
           stack.push({
             type: 'li',
             content: indentContent[i].content,
-            level:indentContent[i].level
+            level:indentContent[i].level,
+            used:undefined
           });
         } else if (indentContent[i].space == indentContent[i - 1].space) {
           stack.push({
             type: 'li',
             content: indentContent[i].content,
-            level:indentContent[i].level
+            level:indentContent[i].level,
+            used:undefined
           })
         }
       }//
@@ -283,13 +343,15 @@ class Parser {
       while (sharpCount < ulCount){
         stack.push({
           type:'#',
-          content:''
+          content:'',
+          used:undefined
         })
         sharpCount++
       }
 
       console.log(stack);
       while (stack.length !== 0) {
+        debugger;
         section = this.addLine(section, stack);
       }
 
@@ -378,9 +440,9 @@ Parser.addLi = function(text,content){
  */
 Parser.addList = function(text,type){
   if(type == 'ol'){
-    text = `<ol>${text}</ol>`;
+    text = `<ol data-v-2bc4b246>${text}</ol>`;
   }else{
-    text = `<ul>${text}</ul>`;
+    text = `<ul data-v-2bc4b246>${text}</ul>`;
   }
   return text;
 };
@@ -397,16 +459,15 @@ Parser.addLine = function (text,stack) {
       tempSection = `<li>${temp.content}</li>${tempSection}`;
     } else if (temp.type == 'ul') {
 
-        return "<ul>" + tempSection + text;
+        return "<ul data-v-2bc4b246>" + tempSection + text;
 
     } else if(temp.type == 'ol'){
 
-        return "<ol>" + tempSection + text;
+        return "<ol data-v-2bc4b246>" + tempSection + text;
 
     }else  if (temp.type == '#') {
 
-        for(let i = 0;i < stack.length; i ++){
-
+        for(let i = stack.length-1;i >= 0; i --){
           if(stack[i].used == false){
 
             if(stack[i].type == 'ul'){
@@ -415,23 +476,24 @@ Parser.addLine = function (text,stack) {
             }else if (stack[i].type == 'ol'){
               stack[i].used = true;
               return '</ol>' + tempSection + text;
+            }else{
+              return '</ul>' + tempSection  + text;
             }
 
           }
 
         }
-        // return  '</ul>' +tempSection +  text;
 
     }
     temp = stack.pop();
   }
   if(temp.type == 'ul'){
 
-    return '<ul>' + tempSection + text;
+    return '<ul data-v-2bc4b246>' + tempSection + text;
 
   }else{
 
-    return '<ol>' + tempSection + text;
+    return '<ol data-v-2bc4b246>' + tempSection + text;
 
   }
 

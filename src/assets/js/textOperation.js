@@ -149,7 +149,7 @@ class TextOperation {
     let position = this.getPosition();
     let temp = this.element.value;
     temp = temp.split("");
-    temp.splice(position.start,0,"\n[]()");
+    temp.splice(position.start,0,"[]()");
     this.element.value = temp.join("");
   }
 
@@ -167,7 +167,7 @@ class TextOperation {
     let position = this.getPosition();
     let temp = this.element.value;
     temp = temp.split("");
-    temp.splice(position.start,0,"\n$$ $$");
+    temp.splice(position.start,0,"$$ $$");
     this.element.value = temp.join("");
   }
 
@@ -178,7 +178,7 @@ class TextOperation {
     let position = this.getPosition();
     let temp = this.element.value;
     temp = temp.split("");
-    temp.splice(position.start,0,"\n![]()");
+    temp.splice(position.start,0,"![]()");
     this.element.value = temp.join("");
   }
 
@@ -189,7 +189,7 @@ class TextOperation {
     let position = this.getPosition();
     let temp = this.element.value;
     temp = temp.split("");
-    temp.splice(position.start,0,"\n------------\n");
+    temp.splice(position.start,0,"------------------------------------------------------------------------\n");
     this.element.value = temp.join("");
   }
 
@@ -197,7 +197,7 @@ class TextOperation {
     let position = this.getPosition();
     let temp = this.element.value;
     temp = temp.split("");
-    temp.splice(position.start,0,"\n# ");
+    temp.splice(position.start,0,"# ");
     this.element.value = temp.join("");
   }
 
@@ -205,7 +205,7 @@ class TextOperation {
     let position = this.getPosition();
     let temp = this.element.value;
     temp = temp.split("");
-    temp.splice(position.start,0,"** **");
+    temp.splice(position.start,0,"****");
     this.element.value = temp.join("");
   }
 
@@ -213,7 +213,7 @@ class TextOperation {
     let position = this.getPosition();
     let temp = this.element.value;
     temp = temp.split("");
-    temp.splice(position.start,0,"* *");
+    temp.splice(position.start,0,"**");
     this.element.value = temp.join("");
   }
 }

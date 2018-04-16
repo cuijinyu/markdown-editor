@@ -176,6 +176,11 @@ export default editor;
 </script>
 
 <style scoped lang="less">
+  ul{
+    margin-top:5px;
+    margin-bottom:5px;
+    margin-left:20px;
+  }
   body{
     margin:0px;
   }
