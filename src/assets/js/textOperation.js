@@ -139,7 +139,11 @@ class TextOperation {
    * 变为粗体字
    */
   changeToBold(){
-
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,"**");
+    temp.splice(position.end,0,"**");
   }
 
   /**
@@ -157,7 +161,11 @@ class TextOperation {
    * 变为斜体字
    */
   changeToItalic(){
-
+    let position = this.getPosition();
+    let temp = this.element.value;
+    temp = temp.split("");
+    temp.splice(position.start,0,"*");
+    temp.splice(position.end,0,"*");
   }
 
   /**
@@ -205,7 +213,8 @@ class TextOperation {
     let position = this.getPosition();
     let temp = this.element.value;
     temp = temp.split("");
-    temp.splice(position.start,0,"****");
+    temp.splice(position.start,0,"**");
+    temp.splice(position.end+1,0,"**");
     this.element.value = temp.join("");
   }
 
@@ -213,7 +222,8 @@ class TextOperation {
     let position = this.getPosition();
     let temp = this.element.value;
     temp = temp.split("");
-    temp.splice(position.start,0,"**");
+    temp.splice(position.start,0,"*");
+    temp.splice(position.end+1,0,"*");
     this.element.value = temp.join("");
   }
 }
