@@ -134,17 +134,7 @@ class TextOperation {
 </table>\n`);
     this.element.value = temp.join("");
   }
-
-  /**
-   * 变为粗体字
-   */
-  changeToBold(){
-    let position = this.getPosition();
-    let temp = this.element.value;
-    temp = temp.split("");
-    temp.splice(position.start,0,"**");
-    temp.splice(position.end,0,"**");
-  }
+  
 
   /**
    * 添加链接
@@ -157,16 +147,6 @@ class TextOperation {
     this.element.value = temp.join("");
   }
 
-  /**
-   * 变为斜体字
-   */
-  changeToItalic(){
-    let position = this.getPosition();
-    let temp = this.element.value;
-    temp = temp.split("");
-    temp.splice(position.start,0,"*");
-    temp.splice(position.end,0,"*");
-  }
 
   /**
    * 添加公式
