@@ -1,7 +1,7 @@
 {
-  "name": "makedown",
+  "name": "markdown",
   "version": "1.0.0",
-  "description": "An editor of makedown,and a vue component",
+  "description": "An editor of markdown,and a vue component",
   "author": "cuijinyu <2510271615@qq.com>",
   "private": true,
   "scripts": {
