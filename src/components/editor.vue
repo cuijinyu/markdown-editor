@@ -58,7 +58,6 @@ let editor = {
     },
     addTitle(){
       let pos = this.op.getPosition().start;
-      console.log(this.op);
       this.op.addTitle();
       this.input = document.getElementById("input-textarea").value;
       this.op.setPosition(pos+1,pos+1);
@@ -152,7 +151,6 @@ let editor = {
           clearInterval(flag);
           flag = setInterval(()=>{
             self.beforeInput = self.input;
-            console.log(self.input);
             self.output = Parser.parse(self.input);
             /**
              * 利用highlight高亮代码

@@ -7,11 +7,11 @@ const rules = {
   code:/(?:\s)?```\n?([^`]+)```/g,
   breaker:/(^--+)|(\n--+)/g,
   list:/([-+*]{1})(.[^\*]*)?/g,
-  link:/\[(.*)\]\((.*)\)/g,
-  pics:/!\[(.*)\]\((.*)\)/g,
+  link:/\[(.*)\]\((.*[^\n])\)/g,
+  pics:/!\[(.*)\]\((.[^\n]*)\)/g,
   mail:/<(([a-z0-9_\-\.])+\@([a-z0-9_\-\.])+\.([a-z]{2,7}))>/gmi,
   quote:/^( *>[^\n]+(\n(?!)[^\n]+)*\n*)+/gm,
-  text:/(?:^\n)?(^[^<|>][\u4e00-\u9fa5a-z0-9_\-\.\@\*\s^\n]+)\n?/gm,
+  text:/(?:^\n)?(^[^<|>][\u4e00-\u9fa5a-z0-9_\-\.\@\*\s^\n]+)\n?$/gm,
   // text:/>([\u4e00-\u9fa5a-z0-9_\-\.\@\*\s]+)</gm,
   def:/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
   lists: /^(((\s*)((\*|\-)|\d(\.|\))) [^\n]+)\n)+/gm,
@@ -349,13 +349,10 @@ class Parser {
         sharpCount++
       }
 
-      console.log(stack);
       while (stack.length !== 0) {
-        debugger;
         section = this.addLine(section, stack);
       }
 
-      console.log(section);
       text = text.replace(regResult[0], section);
     }
 
@@ -391,25 +388,26 @@ class Parser {
      * email
      */
     while((regResult = rules.mail.exec(text)) !== null){
-      console.log("I am mail link");
-      console.log(regResult);
+
       let content = regResult[1];
       text = text.replace(regResult[0],`<a href="mailto:${content}">${content}</a>`);
     }
 
-    // /**
-    //  * text
-    //  */
-    // while((regResult = rules.text.exec(text)) !== null){
-    //   console.log(regResult);
-    //   let content = escape(regResult[1]);
-    //   text = text.replace(regResult[0],`<p>${content}</p>`);
-    // }
-
-
+    /**
+     * text
+     */
     while((regResult = rules.text.exec(text)) !== null){
-      console.log(regResult);
+      let section = "";//用来存储生成的段落
+      let ps = regResult[0].split("\n");
+
+      for(let i = 0;i < ps.length;i ++){
+        if(ps[i] != ""){
+          section += `<p>${escape(ps[i])}</p>`;
+        }
+      }
+      text = text.replace(regResult[0],section);
     }
+
     /**
      * 处理换行
      */
