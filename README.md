@@ -1,3 +1,3 @@
-# makedown
+# markdown
 
-> An editor of makedown,and a vue component
+> An editor of markdown,and a vue component
